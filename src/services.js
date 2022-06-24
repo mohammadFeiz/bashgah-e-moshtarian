@@ -39,6 +39,11 @@ async function services(type,parameters){
         return 89500;
       },
       async awards(){
+        let {activeAwardSort} = parameters;
+        //activeAwardSort => '0' : 'محبوب ترین'
+        //activeAwardSort => '1' : 'جدید ترین'
+        //activeAwardSort => '2' : 'الماس از کم به زیاد'
+        //activeAwardSort => '3' : 'الماس از زیاد به کم'
         return [
         {
           title:'سفر به کیش',text:'بلیط دو طرفه سفر به کیش',score:12000,
@@ -106,6 +111,17 @@ async function services(type,parameters){
           {start:2,end:7,value:3,score:175,points:[2,5,7],title:'استمرار خرید',text:'واسه هر فاکتورت امتیاز بگیر!',affix:''},
           {start:50,end:200,value:90,score:140,points:[50,100,200],title:'حجم خرید',text:'سبدت هرچی پر تر امتیازت بیشتر!',affix:'میلیون'},
           {start:7,end:15,value:11,score:290,points:[7,10,15],title:'SKU',text:'فاکتور طولانی، امتیاز نورانی',affix:'نوع'},
+        ]
+      },
+      async getAward(){
+        let {award} = parameters;
+
+      },
+      async details(){
+        return  [
+          {title:'استمرار خرید',text:'برای فاکتور های 4 تا 7 میلیون تومانی 15 امتیاز و بیشتر از 7 میلیون 42 امتیاز',max:10,value:3,labelStep:1,affix:'بار',mileStones:[2,5,7]},
+          {title:'حجم خرید',text:'به ازای هر یک میلیون تومان خرید 1/5 امتیاز ',max:250,value:85,labelStep:50,affix:'میلیون',mileStones:[50,100,200]},
+          {title:'تنوع سبد خرید',text:'برای فاکتور های 4 تا 7 میلیون تومانی 15 امتیاز و بیشتر از 7 میلیون 42 امتیاز',max:20,value:15,labelStep:1,affix:'قلم',mileStones:[7,10,15]},
         ]
       }
     }

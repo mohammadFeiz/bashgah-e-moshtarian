@@ -6,6 +6,7 @@ import AIOButton from './components/aio-button/aio-button';
 import pic1 from './images/1425783 1.png';
 import services from './services';
 import "./style.css";
+import { nodeName } from "jquery";
 let ClubContext = createContext();
 export default class App extends Component {
   constructor(props){ 
@@ -14,9 +15,17 @@ export default class App extends Component {
       activeBottomMenu:2,
       gems:0,
       history:[],
+      details:[],
       poorsant:0,
       score:0,
       awards:[],
+      awardSorts:[
+        {text:'محبوب ترین',value:'0'},
+        {text:'جدید ترین',value:'1'},
+        {text:'الماس از کم به زیاد',value:'2'},
+        {text:'الماس از زیاد به کم',value:'3'}
+      ],
+      activeAwardSort:'0',
       krs:[],
       catchedAwards:[],
       user:{
@@ -32,6 +41,10 @@ export default class App extends Component {
     let history = await services('history');
     this.setState({history})
   }
+  async getDetails(){
+    let details = await services('details');
+    this.setState({details})
+  }
   async getPoorsant(){
     let poorsant = await services('poorsant');
     this.setState({poorsant})
@@ -40,8 +53,8 @@ export default class App extends Component {
     let score = await services('score');
     this.setState({score})
   }
-  async getAwards(){
-    let awards = await services('awards');
+  async getAwards(activeAwardSort = '0'){
+    let awards = await services('awards',{activeAwardSort});
     this.setState({awards})
   }
   async getCatchedAwards(){
@@ -56,6 +69,7 @@ export default class App extends Component {
      this.getGems();
      this.getPoorsant();
      this.getScore();
+     this.getDetails();
      this.getAwards();
   }
   getContent(){
@@ -73,8 +87,14 @@ export default class App extends Component {
     return {
       ...this.state,
       getHistory:this.getHistory.bind(this),
+      getScore:this.getScore.bind(this),
       getCatchedAwards:this.getCatchedAwards.bind(this),
-      getKRs:this.getKRs.bind(this)
+      getKRs:this.getKRs.bind(this),
+      SetState:(obj)=>this.setState(obj),
+      changeAwardSort:async (activeAwardSort)=>{
+        await this.getAwards(activeAwardSort);
+        this.setState({activeAwardSort});
+      }
     }
   }
   render(){
@@ -97,20 +117,18 @@ export default class App extends Component {
 class Home extends Component{
   static contextType = ClubContext;
   state = {
-    openAwards:false,maxScore:300000,activeSort:'0',showDetails:false,activeAwardTab:'0',showAward:false,
-    sorts:[
-      {text:'محبوب ترین',value:'0'},
-      {text:'جدید ترین',value:'1'},
-      {text:'الماس از کم به زیاد',value:'2'},
-      {text:'الماس از زیاد به کم',value:'3'}
-    ],
+    openAwards:false,maxScore:300000,showDetails:false,activeAwardTab:'0',showAward:false,
     tabs:[
       'همه','کالا','خدمات','تخفیف'
     ]
   }
   card(){
     let {showDetails} = this.state;
-    let {user,poorsant,score} = this.context;
+    let {user,poorsant,score,homeCardDetails = {}} = this.context;
+    // let homeCardDetails = {
+    //   type:'برنزی',
+
+    // }
       return {
       size:202,
       className:'home-card margin-0-12',
@@ -129,7 +147,7 @@ class Home extends Component{
                 },
                 {size:16},
                 {
-                  row:[
+                  show:false,row:[
                     {size:20},{size:28,html:getSvg('cash'),align:'vh'},{size:6},
                     {html:'پورسانت هفتگی من',className:'home-card-poorsant-title bold',align:'v'},{size:6},
                     {html:poorsant + ' تومان',className:'home-card-poorsant-value bold',align:'v'},
@@ -140,7 +158,7 @@ class Home extends Component{
             {
               size:120,align:'h',
               column:[
-                {html:'برنزی',className:'home-card-label',align:'vh'},
+                {html:homeCardDetails.type,className:'home-card-label',align:'vh'},
                 {html:'',className:'home-card-label-arrow'},
                 {html:getSvg('bronze'),align:'vh'}
               ]
@@ -215,22 +233,22 @@ class Home extends Component{
     }
   }
   awardsSort(){
-    let {activeSort,sorts} = this.state;
+    let {awardSorts,activeAwardSort,changeAwardSort} = this.context;
     return {
       size:36,childsProps:{align:'v'},className:'margin-0-12 color383A39 bold size14',
       row:[
-        {html:sorts[activeSort].text},
+        {html:awardSorts[activeAwardSort].text},
         {flex:1},
         {
           html:(
             <AIOButton 
               mode='bottom-popover'
               popupHeader={'دسته بندی بر اساس'}
-              activeSort={activeSort}
+              activeAwardSort={activeAwardSort}
               text={getSvg('sort')} type='select'
-              optionChecked='option.value === this.props.activeSort'
-              options={sorts}
-              onChange={(activeSort)=>this.setState({activeSort})}
+              optionChecked='option.value === this.props.activeAwardSort'
+              options={awardSorts}
+              onChange={(activeAwardSort)=>changeAwardSort(activeAwardSort)}
             />
           )
         }]
@@ -264,11 +282,7 @@ class Home extends Component{
     }
   }
   detailsCards(){
-    let details = [
-      {title:'استمرار خرید',text:'برای فاکتور های 4 تا 7 میلیون تومانی 15 امتیاز و بیشتر از 7 میلیون 42 امتیاز',max:10,value:3,labelStep:1,affix:'بار',mileStones:[2,5,7]},
-      {title:'حجم خرید',text:'به ازای هر یک میلیون تومان خرید 1/5 امتیاز ',max:250,value:85,labelStep:50,affix:'میلیون',mileStones:[50,100,200]},
-      {title:'تنوع سبد خرید',text:'برای فاکتور های 4 تا 7 میلیون تومانی 15 امتیاز و بیشتر از 7 میلیون 42 امتیاز',max:20,value:15,labelStep:1,affix:'قلم',mileStones:[7,10,15]},
-    ]
+    let {details} = this.context;
     return {
       gap:12,scroll:'v',flex:1,className:'home-details-cards',
       column:details.map(({title,text,max,value,mileStones,labelStep,affix})=>{
@@ -330,11 +344,15 @@ class Home extends Component{
       ]
     }
   }
+  async getAward(){
+    services('getAward',this.state.showAward)
+    this.setState({showAward:false})
+  }
   award(){
     let {showAward} = this.state;
     let {title,score,description,howToUse,rules} = showAward;
     return {
-      style:{background:'#fff'},flex:1,
+      style:{background:'#fff'},flex:1,scroll:'v',
       column:[
         {size:161,html:'تصویر',align:'vh'},
         {size:36,html:title,className:'size14 bold padding-0-24',align:'v'},
@@ -360,6 +378,8 @@ class Home extends Component{
         {size:36,html:'قوانین و مقررات :',className:'size14 bold padding-0-24',align:'v'},
         {size:36,html:rules,className:'size12 padding-0-24',align:'v'},
         {size:36,html:<div style={{height:2,width:'100%',background:'#ddd'}}></div>,align:'v'},
+        {html:<button style={{background:'#0094D4',color:'#fff',height:45,border:'none',padding:'0 36px',borderRadius:4,fontFamily:'inherit'}}
+        onClick={()=>this.getAward()}>دریافت جایزه</button>,align:'vh'}
         
         
       ]
