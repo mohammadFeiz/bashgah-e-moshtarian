@@ -33,35 +33,43 @@ export default class App extends Component {
     }
   }
   async getGems(){
-    let gems = await services('gems');
+    let {tokenParsed} = this.props;
+    let gems = await services('gems',{tokenParsed});
     this.setState({gems})
   }
   async getHistory(){
-    let history = await services('history');
+    let {tokenParsed} = this.props;
+    let history = await services('history',{tokenParsed});
     this.setState({history})
   }
   async getDetails(){
-    let details = await services('details');
+    let {tokenParsed} = this.props;
+    let details = await services('details',{tokenParsed});
     this.setState({details})
   }
   async getPoorsant(){
-    let poorsant = await services('poorsant');
+    let {tokenParsed} = this.props;
+    let poorsant = await services('poorsant',{tokenParsed});
     this.setState({poorsant})
   }
   async getScore(){
-    let score = await services('score');
+    let {tokenParsed} = this.props;
+    let score = await services('score',{tokenParsed});
     this.setState({score})
   }
   async getAwards(activeAwardSort = '0'){
-    let awards = await services('awards',{activeAwardSort});
+    let {tokenParsed} = this.props;
+    let awards = await services('awards',{activeAwardSort,tokenParsed});
     this.setState({awards})
   }
   async getCatchedAwards(){
-    let catchedAwards = await services('catchedAwards');
+    let {tokenParsed} = this.props;
+    let catchedAwards = await services('catchedAwards',{tokenParsed});
     this.setState({catchedAwards})
   }
   async getKRs(){
-    let krs = await services('KRS');
+    let {tokenParsed} = this.props;
+    let krs = await services('KRS',{tokenParsed});
     this.setState({krs})
   }
   async componentDidMount(){
@@ -346,7 +354,8 @@ class Home extends Component{
     }
   }
   async getAward(){
-    services('getAward',this.state.showAward)
+    let {tokenParsed} = this.context;
+    services('getAward',{award:this.state.showAward,tokenParsed})
     this.setState({showAward:false})
   }
   award(){
