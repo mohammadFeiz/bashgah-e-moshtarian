@@ -9,7 +9,6 @@ import "./style.css";
 let ClubContext = createContext();
 export default class App extends Component {
   constructor(props){
-    debugger; 
     super(props);
     this.state = {
       activeBottomMenu:2,
@@ -86,6 +85,8 @@ export default class App extends Component {
   getContext(){
     return {
       ...this.state,
+      logout:this.props.logout,
+      getAwards:this.getAwards.bind(this),
       getHistory:this.getHistory.bind(this),
       getScore:this.getScore.bind(this),
       getCatchedAwards:this.getCatchedAwards.bind(this),
@@ -391,12 +392,13 @@ class Home extends Component{
   }
   render(){
     let {showDetails,openAwards,showAward} = this.state;
+    let {logout} = this.context;
     return (
       <RVD
         layout={{
           className:'page',
           column:[
-            layout('header',{gems:this.context.gems}),
+            layout('header',{gems:this.context.gems,logout}),
             {size:12},
             openAwards || showAward?false:this.card(),
             showDetails || showAward?false:this.awards(),
@@ -623,11 +625,17 @@ class KRS extends Component{
 function layout(type,parameters = {}){
   let $$ = {
     header(){
-      let {gems = 22567} = parameters;
+      let {gems = 22567,logout = ()=>{}} = parameters;
       return {
         column:[
           {size:48},
-          {align:'v',className:'margin-0-12',row:[{html:getSvg('burux')},{flex:1},{html:gems,className:'header-score'},{html:getSvg('gem1')}]}
+          {
+            align:'v',className:'margin-0-12',
+            row:[
+              {html:getSvg('burux'),attrs:{onClick:()=>logout()}},
+              {flex:1},
+              {html:gems,className:'header-score'},{html:getSvg('gem1')}]
+          }
         ]
       }
     },

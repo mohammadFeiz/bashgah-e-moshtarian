@@ -1,10 +1,10 @@
 import React,{Component} from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import ReactDOM from 'react-dom';
 import { ReactKeycloakProvider,useKeycloak } from "@react-keycloak/web";
 import Keycloak from "keycloak-js";
-class BuruxAuth extends Component {
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+export class BuruxAuth extends Component {
   render(){
     let authClient = new Keycloak({
       "clientId":'Club',
@@ -27,11 +27,9 @@ function Login(){
     return null
   }
   let {logout,tokenParsed} = obj.keycloak;
-  let {preferred_username:username,email,groups,name} = tokenParsed;
-  console.log(obj.keycloak)
   return (
     <InternalLogin
-      data={{username,email,groups,logout,groups,name,token:obj.keycloak.token}}
+      tokenParsed={tokenParsed} logout={logout}
     />
   )
 }
@@ -40,40 +38,15 @@ class InternalLogin extends Component{
     super(props);
     this.state = {}
   }
-  logout(){
-    let {data} = this.props;
-    data.logout()
-  }
   render(){
-    let {app,urls,setting} = this.state;
-    let {data} = this.props;
-    let props = {
-      user:{
-        username:data.username,
-        name:data.name
-      },
-      logout:()=>this.logout(),
-      groups:data.groups,
-    };
-    return <App {...data} logout={()=>this.logout()}/>
+    return <App {...this.props}/>
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
+ReactDOM.render(
     <BuruxAuth />
-  </React.StrictMode>
+  ,
+  document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function
