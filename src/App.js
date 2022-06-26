@@ -6,10 +6,10 @@ import AIOButton from './components/aio-button/aio-button';
 import pic1 from './images/1425783 1.png';
 import services from './services';
 import "./style.css";
-import { nodeName } from "jquery";
 let ClubContext = createContext();
 export default class App extends Component {
-  constructor(props){ 
+  constructor(props){
+    debugger; 
     super(props);
     this.state = {
       activeBottomMenu:2,
